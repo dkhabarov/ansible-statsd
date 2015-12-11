@@ -1,0 +1,5 @@
+---
+statsd_port: 8125
+statsd_graphite_host: localhost
+statsd_graphite_port: 2003
+statsd_pkg_version: "0.7.2"

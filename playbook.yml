@@ -1,0 +1,6 @@
+---
+- name: statsd
+  hosts: graphite
+  user: 'root'
+  roles:
+    - { role: dkhabarov.statsd }

@@ -1,0 +1,17 @@
+---
+galaxy_info:
+  author: Denis Khabarov
+  description: Statsd - Simple daemon for easy stats aggregation
+  license: GPLv3
+  min_ansible_version: 1.3
+  platforms:
+  - name: Ubuntu
+    versions:
+    - trusty
+  - name: Debian
+    versions:
+    - squeeze
+    - wheezy
+  categories:
+  - monitoring
+dependencies: []

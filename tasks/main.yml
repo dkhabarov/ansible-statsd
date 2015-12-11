@@ -1,0 +1,49 @@
+---
+- name: install dependcies
+  apt:
+    pkg: "{{ item }}"
+  with_items:
+    - git
+    - nodejs 
+    - devscripts
+    - debhelper
+  when: ansible_os_family == "Debian"
+
+- name: clone statsd git repo
+  git: 
+    repo: https://github.com/etsy/statsd.git
+    clone: yes
+    update: yes
+    force: yes
+    dest: /usr/src/statsd
+  register: statsd_repo_updated
+
+- name: build package
+  shell: dpkg-buildpackage
+  args:
+    chdir: /usr/src/statsd
+  when: statsd_repo_updated|changed and ansible_os_family == "Debian"
+  ignore_errors: yes
+
+- name: get version
+  shell: "cat ./debian/statsd/DEBIAN/control|grep Version |awk '{print $2}'"
+  args:
+    chdir: /usr/src/statsd
+  register: statsd_pkg_version
+  when: statsd_repo_updated|changed and ansible_os_family == "Debian"
+
+- name: install statsd package
+  apt: 
+    deb: "/usr/src/statsd_{{ statsd_pkg_version.stdout }}_all.deb"
+    deb: "/usr/src/statsd_{{ statsd_pkg_version.stdout }}_all.deb"
+  when: statsd_repo_updated|changed and ansible_os_family == "Debian"
+
+- name: install config template
+  template:
+    src: etc/statsd/localConfig.js.j2
+    dest: /etc/statsd/localConfig.j2
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - service statsd restart
